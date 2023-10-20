@@ -22,29 +22,52 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.*
+import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
-import androidx.compose.ui.focus.*
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.In
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusOwner
+import androidx.compose.ui.focus.FocusOwnerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputModeManager
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.Tab
+import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
-import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.InteropViewCatchPointerModifier
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.input.pointer.PointerInputEvent
+import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.modifier.ModifierLocalManager
-import androidx.compose.ui.node.*
+import androidx.compose.ui.node.BackwardsCompatNode
+import androidx.compose.ui.node.HitTestResult
+import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.LayoutNodeDrawScope
+import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.node.Owner
+import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.platform.DefaultAccessibilityManager
 import androidx.compose.ui.platform.DefaultHapticFeedback
 import androidx.compose.ui.platform.EmptyFocusManager
@@ -52,6 +75,8 @@ import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.PlatformClipboardManager
 import androidx.compose.ui.platform.RenderNodeLayer
 import androidx.compose.ui.platform.SkiaRootForTest
+import androidx.compose.ui.platform.SkiaRootForTest.Companion.onRootCreatedCallback
+import androidx.compose.ui.platform.SkiaRootForTest.Companion.onRootDisposedCallback
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.EmptySemanticsElement
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -62,7 +87,13 @@ import androidx.compose.ui.text.input.PlatformTextInputPluginRegistry
 import androidx.compose.ui.text.input.PlatformTextInputPluginRegistryImpl
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.platform.FontLoader
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.toIntRect
 import kotlin.coroutines.CoroutineContext
 
 private typealias Command = () -> Unit
@@ -74,6 +105,15 @@ private typealias Command = () -> Unit
     InternalComposeUiApi::class
 )
 internal open class RootNodeOwner(
+
+    /**
+     * Currently, [scene] is used only as part of [SkiaRootForTest] interface.
+     * Required only for dispatching input events from test (see SkikoInputDispatcher).
+     *
+     * TODO: Extract separate interface only for pointer input.
+     */
+    override val scene: ComposeScene,
+
     private val platform: Platform,
     parentFocusManager: FocusManager = EmptyFocusManager,
     initDensity: Density = Density(1f, 1f),
@@ -203,18 +243,22 @@ internal open class RootNodeOwner(
         get() = platform.viewConfiguration
 
     override val containerSize: IntSize
-        get() = platform.windowInfo.containerSize
+        // TODO: properly initialize Platform/WindowInfo in tests
+        // get() = platform.windowInfo.containerSize
+        get() = constraints.maxSize
 
     override val hasPendingMeasureOrLayout: Boolean
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
     fun initialize() {
         snapshotObserver.startObserving()
+        onRootCreatedCallback?.invoke(this)
         root.attach(this)
     }
 
     fun dispose() {
         snapshotObserver.stopObserving()
+        onRootDisposedCallback?.invoke(this)
         // we don't need to call root.detach() because root will be garbage collected
     }
 

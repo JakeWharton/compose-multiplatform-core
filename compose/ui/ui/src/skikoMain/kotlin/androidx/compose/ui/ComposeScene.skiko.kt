@@ -171,10 +171,6 @@ class ComposeScene internal constructor(
         invalidate,
     )
 
-    init {
-        platform.sceneRegistry.register(this)
-    }
-
     private var isInvalidationDisabled = false
 
     @Volatile
@@ -224,14 +220,6 @@ class ComposeScene internal constructor(
     internal fun onPointerUpdate() {
         requestUpdatePointer()
     }
-
-    /**
-     * All currently registered [RootForTest]s. After calling [setContent] the first root
-     * will be added. If there is an any [Popup] is present in the content, it will be added as
-     * another [RootForTest]
-     */
-    val roots: Set<RootForTest>
-        get() = platform.sceneRegistry.roots
 
     private val defaultPointerStateTracker = DefaultPointerStateTracker()
 
@@ -298,7 +286,6 @@ class ComposeScene internal constructor(
      */
     fun close() {
         check(!isClosed) { "ComposeScene is already closed" }
-        platform.sceneRegistry.unregister(this)
         composition?.dispose()
         mainOwner?.dispose()
         recomposer.cancel()
@@ -385,7 +372,7 @@ class ComposeScene internal constructor(
         val mainOwner = createMainLayer(
             KeyInputElement(onKeyEvent = onKeyEvent, onPreKeyEvent = onPreviewKeyEvent)
         )
-
+        this.mainOwner = mainOwner
         composition = mainOwner.setContent(
             parentComposition ?: recomposer,
             { compositionLocalContext }
@@ -395,7 +382,6 @@ class ComposeScene internal constructor(
                 content = content
             )
         }
-        this.mainOwner = mainOwner
 
         // to perform all pending work synchronously
         recomposeDispatcher.flush()
@@ -403,6 +389,7 @@ class ComposeScene internal constructor(
 
     private fun createMainLayer(modifier: Modifier): RootNodeOwner {
         val owner = CombinedRootNodeOwner(
+            scene = this,
             platform = platform,
             initDensity = density,
             initLayoutDirection = layoutDirection,

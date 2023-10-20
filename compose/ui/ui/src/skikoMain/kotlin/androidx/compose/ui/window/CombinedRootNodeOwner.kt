@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.window
 
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusOwner
@@ -35,6 +36,7 @@ import androidx.compose.ui.util.fastForEachReversed
 import kotlin.coroutines.CoroutineContext
 
 internal class CombinedRootNodeOwner(
+    scene: ComposeScene,
     platform: Platform,
     initDensity: Density,
     coroutineContext: CoroutineContext,
@@ -43,6 +45,7 @@ internal class CombinedRootNodeOwner(
     onPointerUpdate: () -> Unit,
     modifier: Modifier = Modifier,
 ) : RootNodeOwner(
+    scene = scene,
     platform = platform,
     initDensity = initDensity,
     coroutineContext = coroutineContext,

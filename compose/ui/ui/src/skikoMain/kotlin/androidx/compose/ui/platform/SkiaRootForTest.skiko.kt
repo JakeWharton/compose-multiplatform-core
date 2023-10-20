@@ -16,10 +16,9 @@
 
 package androidx.compose.ui.platform
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
-import androidx.compose.ui.input.pointer.TestPointerInputEventData
-import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.unit.IntSize
 
@@ -27,12 +26,37 @@ import androidx.compose.ui.unit.IntSize
  * The marker interface to be implemented by the desktop root backing the composition.
  * To be used in tests.
  */
+@VisibleForTesting
 @InternalComposeUiApi
 interface SkiaRootForTest : RootForTest {
+    /**
+     * See [WindowInfo.containerSize]
+     */
     val containerSize: IntSize
+
+    /**
+     * The [ComposeScene] which contains this root.
+     * Required only for dispatching input events.
+     *
+     * TODO: Extract separate interface only for pointer input.
+     */
+    val scene: ComposeScene get() = throw UnsupportedOperationException("SkiaRootForTest.scene is not implemented")
 
     /**
      * Whether the Owner has pending layout work.
      */
     val hasPendingMeasureOrLayout: Boolean
+
+    companion object {
+        /**
+         * Called after an RootNodeOwner implementing [SkiaRootForTest] is created. Used by
+         * SkikoComposeUiTest to keep track of all attached roots. Not to be
+         * set or used by any other component.
+         */
+        @VisibleForTesting
+        var onRootCreatedCallback: ((SkiaRootForTest) -> Unit)? = null
+
+        @VisibleForTesting
+        var onRootDisposedCallback: ((SkiaRootForTest) -> Unit)? = null
+    }
 }

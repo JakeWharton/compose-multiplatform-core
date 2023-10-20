@@ -156,13 +156,6 @@ class ImageComposeScene @ExperimentalComposeUiApi constructor(
     fun close(): Unit = scene.close()
 
     /**
-     * All currently registered [RootForTest]s. After calling [setContent] the first root
-     * will be added. If there is an any [Popup] is present in the content, it will be added as
-     * another [RootForTest]
-     */
-    val roots: Set<RootForTest> get() = scene.roots
-
-    /**
      * Constraints used to measure and layout content.
      */
     var constraints: Constraints

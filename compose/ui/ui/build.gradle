@@ -196,6 +196,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             skikoMain {
                 dependsOn(commonMain)
                 dependencies {
+                    api("androidx.annotation:annotation:1.7.0")
                     api(project(":compose:ui:ui-graphics"))
                     api(project(":compose:ui:ui-text"))
                     api(libs.skikoCommon)

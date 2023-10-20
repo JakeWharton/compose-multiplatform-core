@@ -60,6 +60,7 @@ internal fun RootLayout(
     val parentComposition = rememberCompositionContext()
     val (owner, composition) = remember {
         val owner = RootNodeOwner(
+            scene = scene,
             platform = scene.platform,
             coroutineContext = parentComposition.effectCoroutineContext,
             initDensity = density,
