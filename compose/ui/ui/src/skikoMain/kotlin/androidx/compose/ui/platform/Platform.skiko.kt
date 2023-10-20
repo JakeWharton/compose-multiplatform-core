@@ -18,7 +18,7 @@ package androidx.compose.ui.platform
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Rect
@@ -28,12 +28,14 @@ import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.node.LayoutNode
+import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.window.CombinedRootNodeOwner
 
 // Do not make it public, it will be replaced to public shared context between scenes during refactor.
 internal interface Platform {
@@ -42,6 +44,7 @@ internal interface Platform {
     val inputModeManager: InputModeManager
 
     var dialogScrimBlendMode: BlendMode
+    val sceneRegistry: SceneRegistry
 
     fun requestFocusForOwner(): Boolean
     val textInputService: PlatformTextInputService
@@ -60,6 +63,7 @@ internal interface Platform {
             }
 
             override var dialogScrimBlendMode by mutableStateOf(BlendMode.SrcOver)
+            override var sceneRegistry = SceneRegistry()
 
             override val inputModeManager = DefaultInputModeManager()
             override val focusManager = EmptyFocusManager
@@ -105,6 +109,27 @@ internal interface Platform {
                 ) = Unit
             }
         }
+    }
+}
+
+internal class SceneRegistry {
+    private val scenes = mutableSetOf<ComposeScene>()
+    val roots: Set<RootForTest>
+        get() = buildSet {
+            for (scene in scenes) {
+                val owner = scene.mainOwner ?: continue
+                add(owner)
+                if (owner is CombinedRootNodeOwner) {
+                    addAll(owner.attachedOwners)
+                }
+            }
+        }
+
+    fun register(scene: ComposeScene) {
+        scenes.add(scene)
+    }
+    fun unregister(scene: ComposeScene) {
+        scenes.remove(scene)
     }
 }
 

@@ -21,6 +21,7 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.unit.IntSize
 
 /**
  * The marker interface to be implemented by the desktop root backing the composition.
@@ -28,12 +29,7 @@ import androidx.compose.ui.node.RootForTest
  */
 @InternalComposeUiApi
 interface SkiaRootForTest : RootForTest {
-    /**
-     * The [ComposeScene] which contains this root
-     *
-     * TODO: Remove this reference.
-     */
-    val scene: ComposeScene get() = throw UnsupportedOperationException("SkiaRootForTest.scene is not implemented")
+    val containerSize: IntSize
 
     /**
      * Whether the Owner has pending layout work.
