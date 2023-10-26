@@ -47,7 +47,7 @@ interface SkiaRootForTest : RootForTest {
 
     companion object {
         /**
-         * Called after an RootNodeOwner implementing [SkiaRootForTest] is created. Used by
+         * Called after an owner implementing [SkiaRootForTest] is created. Used by
          * SkikoComposeUiTest to keep track of all attached roots. Not to be
          * set or used by any other component.
          */

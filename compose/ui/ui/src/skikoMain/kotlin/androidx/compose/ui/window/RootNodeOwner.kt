@@ -38,7 +38,6 @@ import androidx.compose.ui.focus.FocusOwner
 import androidx.compose.ui.focus.FocusOwnerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputModeManager
@@ -75,8 +74,6 @@ import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.PlatformClipboardManager
 import androidx.compose.ui.platform.RenderNodeLayer
 import androidx.compose.ui.platform.SkiaRootForTest
-import androidx.compose.ui.platform.SkiaRootForTest.Companion.onRootCreatedCallback
-import androidx.compose.ui.platform.SkiaRootForTest.Companion.onRootDisposedCallback
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.semantics.EmptySemanticsElement
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -252,13 +249,13 @@ internal open class RootNodeOwner(
 
     fun initialize() {
         snapshotObserver.startObserving()
-        onRootCreatedCallback?.invoke(this)
+        SkiaRootForTest.onRootCreatedCallback?.invoke(this)
         root.attach(this)
     }
 
     fun dispose() {
         snapshotObserver.stopObserving()
-        onRootDisposedCallback?.invoke(this)
+        SkiaRootForTest.onRootDisposedCallback?.invoke(this)
         // we don't need to call root.detach() because root will be garbage collected
     }
 
@@ -403,8 +400,8 @@ internal open class RootNodeOwner(
 
     override fun screenToLocal(positionOnScreen: Offset): Offset = positionOnScreen
 
-    open fun draw(canvas: org.jetbrains.skia.Canvas) {
-        root.draw(canvas.asComposeCanvas())
+    open fun draw(canvas: Canvas) {
+        root.draw(canvas)
     }
 
     open fun processPointerInput(event: PointerInputEvent) {
