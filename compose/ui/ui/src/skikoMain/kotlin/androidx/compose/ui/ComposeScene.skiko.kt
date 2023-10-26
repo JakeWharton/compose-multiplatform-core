@@ -221,6 +221,14 @@ class ComposeScene internal constructor(
         requestUpdatePointer()
     }
 
+    @Deprecated(
+        message = "The scene isn't tracking list of roots anymore",
+        level = DeprecationLevel.ERROR,
+        replaceWith = ReplaceWith("SkiaRootForTest.onRootCreatedCallback")
+    )
+    val roots: Set<RootForTest>
+        get() = throw NotImplementedError()
+
     private val defaultPointerStateTracker = DefaultPointerStateTracker()
 
     private val job = Job()
