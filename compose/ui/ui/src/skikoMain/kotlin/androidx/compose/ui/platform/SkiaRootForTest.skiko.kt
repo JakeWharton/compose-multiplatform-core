@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.IntSize
  * The marker interface to be implemented by the desktop root backing the composition.
  * To be used in tests.
  */
-@VisibleForTesting
 @InternalComposeUiApi
 interface SkiaRootForTest : RootForTest {
     /**
@@ -53,10 +51,10 @@ interface SkiaRootForTest : RootForTest {
          * SkikoComposeUiTest to keep track of all attached roots. Not to be
          * set or used by any other component.
          */
-        @VisibleForTesting
+        @InternalComposeUiApi
         var onRootCreatedCallback: ((SkiaRootForTest) -> Unit)? = null
 
-        @VisibleForTesting
+        @InternalComposeUiApi
         var onRootDisposedCallback: ((SkiaRootForTest) -> Unit)? = null
     }
 }
