@@ -64,6 +64,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         darwin()
         js()
         wasm()
+        linuxArm64()
     }
 
     kotlin {
@@ -93,6 +94,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             jsNativeMain.dependsOn(jbMain)
             jsMain.dependsOn(jsNativeMain)
             nativeMain.dependsOn(jsNativeMain)
+            linuxArm64Main.dependsOn(nativeMain)
 
             jsMain {
                 dependsOn(jsNativeMain)

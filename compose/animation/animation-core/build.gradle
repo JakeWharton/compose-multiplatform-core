@@ -69,11 +69,12 @@ dependencies {
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
-        android()
-        desktop()
-        darwin()
-        js()
-        wasm()
+//        android()
+//        desktop()
+//        darwin()
+//        js()
+//        wasm()
+        linuxArm64()
     }
 
     kotlin {
@@ -83,12 +84,12 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          */
         sourceSets {
 
-            jvmMain {
-                dependencies {
-                    implementation(libs.kotlinStdlib)
-                    api(libs.kotlinCoroutinesCore)
-                }
-            }
+//            jvmMain {
+//                dependencies {
+//                    implementation(libs.kotlinStdlib)
+//                    api(libs.kotlinCoroutinesCore)
+//                }
+//            }
 
             commonMain.dependencies {
                 implementation(project(":collection:collection"))
@@ -101,59 +102,61 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":annotation:annotation"))
             }
 
-            androidMain {
-                dependencies {
-                    api("androidx.annotation:annotation:1.1.0")
-                    implementation(libs.kotlinStdlib)
-                }
-            }
-            desktopMain {
-                dependencies {
-                    implementation(libs.kotlinStdlib)
-                }
-            }
+//            androidMain {
+//                dependencies {
+//                    api("androidx.annotation:annotation:1.1.0")
+//                    implementation(libs.kotlinStdlib)
+//                }
+//            }
+//            desktopMain {
+//                dependencies {
+//                    implementation(libs.kotlinStdlib)
+//                }
+//            }
             jsNativeMain.dependsOn(commonMain)
             nativeMain.dependsOn(jsNativeMain)
-            jsWasmMain.dependsOn(jsNativeMain)
-
-            jsMain {
-                dependsOn(jsWasmMain)
-            }
-
+//            jsWasmMain.dependsOn(jsNativeMain)
+//
+//            jsMain {
+//                dependsOn(jsWasmMain)
+//            }
+//
             jbMain {
                 dependsOn(commonMain)
                 dependencies {
                     implementation(libs.atomicFu)
                 }
             }
-            desktopMain.dependsOn(jbMain)
-            jsNativeMain.dependsOn(jbMain)
-
-            wasmJsMain {
-                dependsOn(jsWasmMain)
-            }
-
-            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
-            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
-            //  level dependencies block instead:
-            //  `dependencies { testImplementation(libs.robolectric) }`
-            androidTest.dependencies {
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.junit)
-                implementation(libs.truth)
-                implementation(libs.kotlinCoroutinesCore)
-            }
-
-            androidAndroidTest.dependencies {
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.testCore)
-                implementation(libs.junit)
-                implementation(project(":compose:animation:animation"))
-                implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:test-utils"))
-            }
+            linuxArm64Main.dependsOn(jbMain)
+            linuxArm64Main.dependsOn(nativeMain)
+//            desktopMain.dependsOn(jbMain)
+//            jsNativeMain.dependsOn(jbMain)
+//
+//            wasmJsMain {
+//                dependsOn(jsWasmMain)
+//            }
+//
+//            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+//            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+//            //  level dependencies block instead:
+//            //  `dependencies { testImplementation(libs.robolectric) }`
+//            androidTest.dependencies {
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.junit)
+//                implementation(libs.truth)
+//                implementation(libs.kotlinCoroutinesCore)
+//            }
+//
+//            androidAndroidTest.dependencies {
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.testCore)
+//                implementation(libs.junit)
+//                implementation(project(":compose:animation:animation"))
+//                implementation(project(":compose:ui:ui-test-junit4"))
+//                implementation(project(":compose:test-utils"))
+//            }
         }
     }
     dependencies {

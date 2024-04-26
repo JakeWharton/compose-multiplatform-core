@@ -47,11 +47,12 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
 if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
-        android()
-        desktop()
-        darwin()
-        js()
-        wasm()
+//        android()
+//        desktop()
+//        darwin()
+//        js()
+//        wasm()
+        linuxArm64()
     }
 
     kotlin {
@@ -66,16 +67,16 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-graphics"))
                 implementation(project(":compose:ui:ui-unit"))
             }
-
-            androidMain.dependencies {
-                implementation(libs.kotlinStdlib)
-            }
-
-            wasmJsMain {
-                dependencies {
-                    implementation(libs.kotlinStdlib)
-                }
-            }
+//
+//            androidMain.dependencies {
+//                implementation(libs.kotlinStdlib)
+//            }
+//
+//            wasmJsMain {
+//                dependencies {
+//                    implementation(libs.kotlinStdlib)
+//                }
+//            }
         }
     }
     dependencies {

@@ -82,11 +82,12 @@ dependencies {
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
-        android()
-        desktop()
-        darwin()
-        wasm()
-        js()
+//        android()
+//        desktop()
+//        darwin()
+//        wasm()
+//        js()
+        linuxArm64()
     }
 
     kotlin {
@@ -112,17 +113,17 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":collection:collection"))
             }
 
-            androidMain.dependencies {
-                api("androidx.annotation:annotation:1.1.0")
-                implementation("androidx.activity:activity-compose:1.5.0")
-
-                // TODO: remove next 3 dependencies when b/202810604 is fixed
-                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
-
-                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0")
-            }
+//            androidMain.dependencies {
+//                api("androidx.annotation:annotation:1.1.0")
+//                implementation("androidx.activity:activity-compose:1.5.0")
+//
+//                // TODO: remove next 3 dependencies when b/202810604 is fixed
+//                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
+//                implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
+//                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
+//
+//                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0")
+//            }
 
             skikoMain {
                 dependsOn(commonMain)
@@ -132,81 +133,82 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 }
             }
 
-            desktopMain.dependsOn(skikoMain)
+//            desktopMain.dependsOn(skikoMain)
 
             jsNativeMain.dependsOn(skikoMain)
 
             nativeMain.dependsOn(jsNativeMain)
-            jsWasmMain.dependsOn(jsNativeMain)
-            jsMain {
-                kotlin.srcDir("src/webCommonW3C/kotlin")
-                dependsOn(jsWasmMain)
-            }
-            wasmJsMain {
-                kotlin.srcDir("src/webCommonW3C/kotlin")
-                dependsOn(jsWasmMain)
-                dependencies {
-                    implementation(libs.kotlinStdlib)
-                }
-            }
-
-            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
-            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
-            //  level dependencies block instead:
-            //  `dependencies { testImplementation(libs.robolectric) }`
-            androidTest.dependencies {
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.junit)
-                implementation(libs.truth)
-            }
-
-            androidAndroidTest.dependencies {
-                implementation(project(":compose:material3:material3:material3-samples"))
-                implementation(project(":compose:test-utils"))
-                implementation(project(':compose:foundation:foundation-layout'))
-                implementation(androidxArtifact(":test:screenshot:screenshot"))
-                implementation(androidxArtifact(":core:core"))
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.junit)
-                implementation(libs.truth)
-                implementation(libs.dexmakerMockitoInlineExtended)
-                implementation(libs.mockitoKotlin)
-                implementation(libs.testUiautomator)
-            }
-
-            skikoTest.dependencies {
-                implementation(libs.kotlinTest)
-                implementation(project(":compose:ui:ui-test"))
-            }
-
-            desktopTest {
-                dependsOn(skikoTest)
-
-                dependencies {
-                    implementation(project(":compose:ui:ui-test-junit4"))
-                    implementation(libs.truth)
-                    implementation(libs.junit)
-                    implementation(libs.skikoCurrentOs)
-                }
-            }
-
-            jsWasmTest {
-                dependsOn(skikoTest)
-            }
-
-            jsTest {
-                dependsOn(jsWasmTest)
-            }
-
-            wasmJsTest {
-                dependsOn(jsWasmTest)
-            }
-
-            uikitTest {
-                dependsOn(skikoTest)
-            }
+            linuxArm64Main.dependsOn(nativeMain)
+//            jsWasmMain.dependsOn(jsNativeMain)
+//            jsMain {
+//                kotlin.srcDir("src/webCommonW3C/kotlin")
+//                dependsOn(jsWasmMain)
+//            }
+//            wasmJsMain {
+//                kotlin.srcDir("src/webCommonW3C/kotlin")
+//                dependsOn(jsWasmMain)
+//                dependencies {
+//                    implementation(libs.kotlinStdlib)
+//                }
+//            }
+//
+//            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+//            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+//            //  level dependencies block instead:
+//            //  `dependencies { testImplementation(libs.robolectric) }`
+//            androidTest.dependencies {
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.junit)
+//                implementation(libs.truth)
+//            }
+//
+//            androidAndroidTest.dependencies {
+//                implementation(project(":compose:material3:material3:material3-samples"))
+//                implementation(project(":compose:test-utils"))
+//                implementation(project(':compose:foundation:foundation-layout'))
+//                implementation(androidxArtifact(":test:screenshot:screenshot"))
+//                implementation(androidxArtifact(":core:core"))
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.junit)
+//                implementation(libs.truth)
+//                implementation(libs.dexmakerMockitoInlineExtended)
+//                implementation(libs.mockitoKotlin)
+//                implementation(libs.testUiautomator)
+//            }
+//
+//            skikoTest.dependencies {
+//                implementation(libs.kotlinTest)
+//                implementation(project(":compose:ui:ui-test"))
+//            }
+//
+//            desktopTest {
+//                dependsOn(skikoTest)
+//
+//                dependencies {
+//                    implementation(project(":compose:ui:ui-test-junit4"))
+//                    implementation(libs.truth)
+//                    implementation(libs.junit)
+//                    implementation(libs.skikoCurrentOs)
+//                }
+//            }
+//
+//            jsWasmTest {
+//                dependsOn(skikoTest)
+//            }
+//
+//            jsTest {
+//                dependsOn(jsWasmTest)
+//            }
+//
+//            wasmJsTest {
+//                dependsOn(jsWasmTest)
+//            }
+//
+//            uikitTest {
+//                dependsOn(skikoTest)
+//            }
 
             configureEach {
                 languageSettings.optIn("androidx.compose.material3.ExperimentalMaterial3Api")
